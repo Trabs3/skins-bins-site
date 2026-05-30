@@ -1,0 +1,21 @@
+# Proxy suspicious/bot paths through logging function
+# Format: /path  /.netlify/functions/log-request?path=/path  200
+
+/wp-admin/*  /.netlify/functions/log-request?path=/wp-admin/:splat  200
+/wp-login.php  /.netlify/functions/log-request?path=/wp-login.php  200
+/wp-content/*  /.netlify/functions/log-request?path=/wp-content/:splat  200
+/wp-includes/*  /.netlify/functions/log-request?path=/wp-includes/:splat  200
+/xmlrpc.php  /.netlify/functions/log-request?path=/xmlrpc.php  200
+/robots.txt  /.netlify/functions/log-request?path=/robots.txt  200
+/.env  /.netlify/functions/log-request?path=/.env  200
+/config.php  /.netlify/functions/log-request?path=/config.php  200
+/admin/*  /.netlify/functions/log-request?path=/admin/:splat  200
+/phpmyadmin/*  /.netlify/functions/log-request?path=/phpmyadmin/:splat  200
+/shell.php  /.netlify/functions/log-request?path=/shell.php  200
+/eval.php  /.netlify/functions/log-request?path=/eval.php  200
+/setup.php  /.netlify/functions/log-request?path=/setup.php  200
+/install.php  /.netlify/functions/log-request?path=/install.php  200
+/backup/*  /.netlify/functions/log-request?path=/backup/:splat  200
+/api/*  /.netlify/functions/log-request?path=/api/:splat  200
+/sitemap.xml  /.netlify/functions/log-request?path=/sitemap.xml  200
+/sitemap_index.xml  /.netlify/functions/log-request?path=/sitemap_index.xml  200

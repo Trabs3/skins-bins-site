@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skins — Skin Beans</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --bg2: #141414;
+      --bg3: #1a1a1a;
+      --border: #222;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #ff7c2a;
+      --accent2: #e06520;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent); }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 32px;
+    }
+
+    nav ul a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--text); }
+    nav ul a.active { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #0d0d0d !important;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem !important;
+    }
+
+    .page-header {
+      padding: 60px 40px 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .page-header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .filters {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 40px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font);
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .skin-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 32px 40px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .skin-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .skin-card:hover {
+      border-color: #333;
+      transform: translateY(-2px);
+    }
+
+    .skin-img {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--bg3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skin-info { padding: 14px; }
+
+    .skin-game {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .skin-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .skin-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .skin-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .skin-change {
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .skin-change.up {
+      background: rgba(255, 124, 42, 0.12);
+      color: var(--accent);
+    }
+
+    .skin-change.down {
+      background: rgba(255, 80, 80, 0.12);
+      color: #ff6060;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      nav ul { display: none; }
+      .page-header, .filters, .skin-grid { padding-left: 20px; padding-right: 20px; }
+      .skin-grid { grid-template-columns: repeat(2, 1fr); }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P71RVY7X3R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-P71RVY7X3R');
+</script>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">skin beans<span>.</span></a>
+    <ul>
+      <li><a href="index.html#how">how it works</a></li>
+      <li><a href="skins.html" class="active">skins</a></li>
+      <li><a href="about.html">about</a></li>
+      <li><a href="index.html#join" class="nav-cta">early access</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-header">
+    <div class="section-label">Market data</div>
+    <h1>Tracked skins</h1>
+    <p>Live prices across 12 platforms. Updated every 15 minutes.</p>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">CS2</button>
+    <button class="filter-btn">Dota 2</button>
+    <button class="filter-btn">Rust</button>
+    <button class="filter-btn">TF2</button>
+    <button class="filter-btn">Trending ↑</button>
+    <button class="filter-btn">Under $10</button>
+  </div>
+
+  <div class="skin-grid">
+
+    <div class="skin-card">
+      <div class="skin-img">🔫</div>
+      <div class="skin-info">
+        <div class="skin-game">CS2</div>
+        <div class="skin-name">AK-47 | Redline (FT)</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$18.40</span>
+          <span class="skin-change up">+3.2%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-card">
+      <div class="skin-img">🗡️</div>
+      <div class="skin-info">
+        <div class="skin-game">CS2</div>
+        <div class="skin-name">Karambit | Fade (FN)</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$1,240</span>
+          <span class="skin-change up">+1.8%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-card">
+      <div class="skin-img">🔫</div>
+      <div class="skin-info">
+        <div class="skin-game">CS2</div>
+        <div class="skin-name">AWP | Dragon Lore (FT)</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$3,800</span>
+          <span class="skin-change down">-0.5%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-card">
+      <div class="skin-img">🛡️</div>
+      <div class="skin-info">
+        <div class="skin-game">Dota 2</div>
+        <div class="skin-name">Arcana — Phantom Assassin</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$28.00</span>
+          <span class="skin-change up">+0.9%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-card">
+      <div class="skin-img">🔫</div>
+      <div class="skin-info">
+        <div class="skin-game">CS2</div>
+        <div class="skin-name">M4A4 | Howl (MW)</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$4,100</span>
+          <span class="skin-change down">-1.2%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-card">
+      <div class="skin-img">🪓</div>
+      <div class="skin-info">
+        <div class="skin-game">Rust</div>
+        <div class="skin-name">Hatchet — Tempered</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$4.20</span>
+          <span class="skin-change up">+5.1%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-card">
+      <div class="skin-img">🔫</div>
+      <div class="skin-info">
+        <div class="skin-game">CS2</div>
+        <div class="skin-name">Glock-18 | Fade (FN)</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$320</span>
+          <span class="skin-change up">+2.4%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-card">
+      <div class="skin-img">🗡️</div>
+      <div class="skin-info">
+        <div class="skin-game">CS2</div>
+        <div class="skin-name">Butterfly | Doppler (FN)</div>
+        <div class="skin-price-row">
+          <span class="skin-price">$890</span>
+          <span class="skin-change down">-0.3%</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2025 skin beans.</span>
+    <span><a href="about.html">about</a> · <a href="index.html">home</a></span>
+  </footer>
+
+<script>
+(function trackVisit() {
+  var LOGGER_URL = "https://skins.companybbig.workers.dev/";
+  var SITE_ID = "skins-bins";
+  var TEST_RUN_ID = "skins_bins_test_jun";
+
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+  }
+
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  function setCookie(name, value, days) {
+    var maxAge = days * 24 * 60 * 60;
+    document.cookie = name + "=" + encodeURIComponent(value) + "; path=/; max-age=" + maxAge + "; SameSite=Lax";
+  }
+
+  function firePixel(extraParams) {
+    try {
+      var img = new Image();
+      var params = new URLSearchParams();
+      params.set("site_id", SITE_ID);
+      params.set("test_run_id", TEST_RUN_ID);
+      if (extraParams) {
+        Object.keys(extraParams).forEach(function(key) {
+          if (extraParams[key] !== null && extraParams[key] !== undefined) params.set(key, String(extraParams[key]));
+        });
+      }
+      img.src = LOGGER_URL + "pixel?" + params.toString();
+    } catch (e) {}
+  }
+
+  function sendLog(data) {
+    var json = JSON.stringify(data);
+    if (navigator.sendBeacon) {
+      try {
+        var blob = new Blob([json], { type: "text/plain;charset=UTF-8" });
+        var ok = navigator.sendBeacon(LOGGER_URL, blob);
+        if (ok) return;
+      } catch (e) {}
+    }
+    fetch(LOGGER_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: json, keepalive: true }).catch(function () {});
+  }
+
+  async function probeSimilarwebExtension() {
+    var candidates = [
+      { name: "similarweb", id: "hoklmmgfnpapgjgcpechhaamimifchmp", paths: ["images/icon16.png","images/icon48.png","images/icon128.png","panel/panel.html","frame_ant/frame_ant.js"] },
+      { name: "avast", id: "gomekmidlodglbbmalcneegieacbdmki", paths: ["icons/bg.png"] },
+      { name: "stands_adblocker", id: "lgblnfidahcdcjddiepkckcfdhpknnjh", paths: ["views/web_accessible/block-element/view.html"] },
+      { name: "monica", id: "ofpnmcalabcbjgholdjcjblkibolbppb", paths: ["chatTab.html"] },
+      { name: "poper_blocker", id: "bkkbcggnhapdmkeljlodobbkopceiche", paths: ["message.html","injectScript.js","injectScriptAdjust.js","youtubeAdBlockInjectScript.js","videoStreamAdBlockInjectScript.js","twitchStreamAdBlockInjectScript.js"] },
+      { name: "stylish", id: "fjnbnpbmkenffdnngjfgmeleoegfcffe", paths: ["index.html"] },
+      { name: "seoquake", id: "akdgnmcogleenhbclghghlkkdndkjdjc", paths: ["static/audit.png"] },
+      { name: "blocksite", id: "eiimnmioipafcokbfikbljfdeojpcgbh", paths: ["public/popup.html"] },
+      { name: "video_downloader_plus", id: "njgehaondchbmjmajphnhlojfnbfokng", paths: ["popup.html"] }
+    ];
+    var attemptDelaysMs = [0, 500, 1500];
+    function wait(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+    async function tryImageProbe(url) {
+      return new Promise(function(resolve) {
+        var img = new Image(); var finished = false;
+        var timer = setTimeout(function() { if (finished) return; finished = true; resolve({ ok: false, reason: "timeout" }); }, 1500);
+        img.onload = function() { if (finished) return; finished = true; clearTimeout(timer); resolve({ ok: true, reason: "loaded" }); };
+        img.onerror = function() { if (finished) return; finished = true; clearTimeout(timer); resolve({ ok: false, reason: "error" }); };
+        img.src = url + "?t=" + Date.now() + "-" + Math.random();
+      });
+    }
+    async function tryFetchProbe(url) {
+      var controller = null; var timeoutId = null;
+      try {
+        if (window.AbortController) { controller = new AbortController(); timeoutId = setTimeout(function() { controller.abort(); }, 1500); }
+        await fetch(url + "?t=" + Date.now() + "-" + Math.random(), { method: "GET", mode: "no-cors", cache: "no-store", signal: controller ? controller.signal : undefined });
+        if (timeoutId) clearTimeout(timeoutId);
+        return { ok: true, reason: "fetch_no_cors_resolved" };
+      } catch (e) {
+        if (timeoutId) clearTimeout(timeoutId);
+        return { ok: false, reason: e && e.name === "AbortError" ? "timeout" : "fetch_error", error: String(e && e.message ? e.message : e) };
+      }
+    }
+    async function runSingleAttempt(attemptIndex, alreadyMatchedNames) {
+      var results = []; var matched = [];
+      for (var i = 0; i < candidates.length; i++) {
+        var candidate = candidates[i];
+        if (alreadyMatchedNames[candidate.name]) continue;
+        var candidateDetected = false;
+        for (var j = 0; j < candidate.paths.length; j++) {
+          var path = candidate.paths[j];
+          var url = "chrome-extension://" + candidate.id + "/" + path;
+          var result = (path.indexOf(".png") !== -1 || path.indexOf(".jpg") !== -1 || path.indexOf(".jpeg") !== -1 || path.indexOf(".svg") !== -1 || path.indexOf(".gif") !== -1 || path.indexOf(".webp") !== -1) ? await tryImageProbe(url) : await tryFetchProbe(url);
+          results.push({ attempt: attemptIndex + 1, name: candidate.name, id: candidate.id, path: path, ok: result.ok, reason: result.reason, error: result.error || null });
+          if (result.ok && !candidateDetected) { candidateDetected = true; matched.push({ name: candidate.name, id: candidate.id, matched_path: path, attempt: attemptIndex + 1 }); break; }
+        }
+      }
+      return { detected: matched.length > 0, matched: matched, results: results };
+    }
+    var allResults = []; var allMatched = []; var alreadyMatchedNames = {};
+    for (var attemptIndex = 0; attemptIndex < attemptDelaysMs.length; attemptIndex++) {
+      if (attemptDelaysMs[attemptIndex] > 0) await wait(attemptDelaysMs[attemptIndex]);
+      var attemptResult = await runSingleAttempt(attemptIndex, alreadyMatchedNames);
+      allResults = allResults.concat(attemptResult.results || []);
+      attemptResult.matched.forEach(function(m) { if (!alreadyMatchedNames[m.name]) { alreadyMatchedNames[m.name] = true; allMatched.push(m); } });
+      if (allMatched.length === candidates.length) break;
+    }
+    var firstMatch = allMatched.length > 0 ? allMatched[0] : null;
+    var swMatch = allMatched.find(function(m) { return m.name === "similarweb"; }) || null;
+    return { checked: true, detected: allMatched.length > 0, matched_name: swMatch ? swMatch.name : (firstMatch ? firstMatch.name : null), matched_id: swMatch ? swMatch.id : (firstMatch ? firstMatch.id : null), matched_path: swMatch ? swMatch.matched_path : (firstMatch ? firstMatch.matched_path : null), detected_on_attempt: swMatch ? swMatch.attempt : (firstMatch ? firstMatch.attempt : null), matched_extensions: allMatched, attempt_delays_ms: attemptDelaysMs, results: allResults };
+  }
+
+  var cookieVisitorId = getCookie("sb_visitor_id");
+  var isNewCookieVisitor = false;
+  if (!cookieVisitorId) { cookieVisitorId = uuid(); setCookie("sb_visitor_id", cookieVisitorId, 30); isNewCookieVisitor = true; }
+  var localVisitorId = null; var isNewLocalVisitor = false;
+  try { localVisitorId = localStorage.getItem("sb_local_visitor_id"); if (!localVisitorId) { localVisitorId = uuid(); localStorage.setItem("sb_local_visitor_id", localVisitorId); isNewLocalVisitor = true; } } catch (e) { localVisitorId = null; }
+  var visitId = null; var pageviewIndex = 0; var isInitialPageview = false;
+  try {
+    visitId = sessionStorage.getItem("sb_visit_id");
+    pageviewIndex = Number(sessionStorage.getItem("sb_pageview_index") || "0");
+    if (!visitId) { visitId = uuid(); sessionStorage.setItem("sb_visit_id", visitId); isInitialPageview = true; }
+    pageviewIndex += 1; sessionStorage.setItem("sb_pageview_index", String(pageviewIndex));
+  } catch (e) { visitId = uuid(); pageviewIndex = 1; isInitialPageview = true; }
+
+  var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+  var navigationType = navEntry ? navEntry.type : "unknown";
+  var params = new URLSearchParams(window.location.search);
+
+  firePixel({ cb: "static" });
+  firePixel({ page_url: window.location.href, path: window.location.pathname, visit_id: visitId, cb: Date.now() + "-" + Math.random() });
+
+  var basePayload = { site_id: SITE_ID, test_run_id: TEST_RUN_ID, timestamp: new Date().toISOString(), visit_id: visitId, pageview_index: pageviewIndex, is_initial_pageview: isInitialPageview, navigation_type: navigationType, cookie_visitor_id: cookieVisitorId, local_visitor_id: localVisitorId, is_new_cookie_visitor: isNewCookieVisitor, is_new_local_visitor: isNewLocalVisitor, cookie_enabled: navigator.cookieEnabled, page_url: window.location.href, path: window.location.pathname, query: window.location.search, document_referrer: document.referrer, user_agent: navigator.userAgent, language: navigator.language, languages: navigator.languages || null, platform: navigator.platform, vendor: navigator.vendor, viewport: window.innerWidth + "x" + window.innerHeight, screen: screen.width + "x" + screen.height, color_depth: screen.colorDepth, pixel_depth: screen.pixelDepth, device_pixel_ratio: window.devicePixelRatio || null, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, timezone_offset_minutes: new Date().getTimezoneOffset(), hardware_concurrency: navigator.hardwareConcurrency || null, device_memory: navigator.deviceMemory || null, max_touch_points: navigator.maxTouchPoints || 0, webdriver: navigator.webdriver, plugins_count: navigator.plugins ? navigator.plugins.length : null, mime_types_count: navigator.mimeTypes ? navigator.mimeTypes.length : null, connection_type: navigator.connection ? navigator.connection.effectiveType : null, connection_downlink: navigator.connection ? navigator.connection.downlink : null, connection_rtt: navigator.connection ? navigator.connection.rtt : null, utm_source: params.get("utm_source"), utm_medium: params.get("utm_medium"), utm_campaign: params.get("utm_campaign"), utm_content: params.get("utm_content"), utm_term: params.get("utm_term"), headless: (function(){ var s={}; s.webdriver=!!navigator.webdriver; s.plugins_count=navigator.plugins?navigator.plugins.length:0; s.languages_count=(navigator.languages||[]).length; s.languages_raw=(navigator.languages||[]).join(','); s.chrome_present=!!(window.chrome); s.chrome_runtime=!!(window.chrome&&window.chrome.runtime); try{s.notification_permission=Notification.permission;}catch(e){s.notification_permission='error';} try{var cv=document.createElement('canvas');var gl=cv.getContext('webgl')||cv.getContext('experimental-webgl');if(gl){var di=gl.getExtension('WEBGL_debug_renderer_info');s.webgl_vendor=di?gl.getParameter(di.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR);s.webgl_renderer=di?gl.getParameter(di.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);}else{s.webgl_vendor=null;s.webgl_renderer=null;}}catch(e){s.webgl_vendor='error';s.webgl_renderer='error';} try{var c2=document.createElement('canvas');c2.width=200;c2.height=50;var cx=c2.getContext('2d');cx.font='14px Arial';cx.fillStyle='#f60';cx.fillRect(125,1,62,20);cx.fillStyle='#069';cx.fillText('SkinBeans',2,15);var du=c2.toDataURL();var h=0;for(var i=0;i<du.length;i++){h=((h<<5)-h)+du.charCodeAt(i);h|=0;}s.canvas_hash=h;}catch(e){s.canvas_hash=null;} s.is_swiftshader=s.webgl_renderer?s.webgl_renderer.toLowerCase().indexOf('swiftshader')!==-1:false; s.is_llvmpipe=s.webgl_renderer?s.webgl_renderer.toLowerCase().indexOf('llvmpipe')!==-1:false; s.likely_headless=s.webdriver||s.plugins_count===0||s.is_swiftshader||s.is_llvmpipe; return s; })() };
+
+  sendLog(Object.assign({}, basePayload, { log_type: "visit_initial", sent_at: new Date().toISOString(), time_on_page_ms: Math.round(performance.now()) }));
+
+  setTimeout(function() { sendLog({ site_id: SITE_ID, test_run_id: TEST_RUN_ID, log_type: "heartbeat_2s", timestamp: new Date().toISOString(), visit_id: visitId, pageview_index: pageviewIndex, cookie_visitor_id: cookieVisitorId, local_visitor_id: localVisitorId, page_url: window.location.href, path: window.location.pathname, document_referrer: document.referrer, visibility_state: document.visibilityState, time_on_page_ms: Math.round(performance.now()) }); }, 2000);
+
+  probeSimilarwebExtension()
+    .then(function(extensionProbe) { sendLog({ site_id: SITE_ID, test_run_id: TEST_RUN_ID, log_type: "extension_probe", timestamp: new Date().toISOString(), visit_id: visitId, pageview_index: pageviewIndex, cookie_visitor_id: cookieVisitorId, local_visitor_id: localVisitorId, page_url: window.location.href, path: window.location.pathname, document_referrer: document.referrer, similarweb_extension_probe: extensionProbe, time_on_page_ms: Math.round(performance.now()) }); })
+    .catch(function(error) { sendLog({ site_id: SITE_ID, test_run_id: TEST_RUN_ID, log_type: "extension_probe_error", timestamp: new Date().toISOString(), visit_id: visitId, pageview_index: pageviewIndex, cookie_visitor_id: cookieVisitorId, local_visitor_id: localVisitorId, page_url: window.location.href, path: window.location.pathname, document_referrer: document.referrer, similarweb_extension_probe: { checked: true, detected: false, error: String(error && error.message ? error.message : error) }, time_on_page_ms: Math.round(performance.now()) }); });
+
+  document.addEventListener("visibilitychange", function() { if (document.visibilityState === "hidden") { sendLog({ site_id: SITE_ID, test_run_id: TEST_RUN_ID, log_type: "page_hidden", timestamp: new Date().toISOString(), visit_id: visitId, pageview_index: pageviewIndex, cookie_visitor_id: cookieVisitorId, local_visitor_id: localVisitorId, page_url: window.location.href, path: window.location.pathname, document_referrer: document.referrer, time_on_page_ms: Math.round(performance.now()) }); } });
+})();
+</script>
+<img src="https://skins.companybbig.workers.dev/pixel?site_id=skins-bins&test_run_id=skins_bins_test_jun&cb=static" width="1" height="1" style="display:none" alt="" />
+<noscript>
+  <img src="https://skins.companybbig.workers.dev/pixel?site_id=skins-bins&test_run_id=skins_bins_test_jun&noscript=1" width="1" height="1" style="display:none" alt="" />
+</noscript>
+<script>
+(function envDump() {
+  var LOGGER_URL = "https://skins.companybbig.workers.dev/";
+  var SITE_ID = "skins-bins";
+  var TEST_RUN_ID = "skins_bins_test_jun";
+  function sendLog(data) {
+    var json = JSON.stringify(data);
+    if (navigator.sendBeacon) { try { var b = new Blob([json], {type:"text/plain;charset=UTF-8"}); if(navigator.sendBeacon(LOGGER_URL, b)) return; } catch(e){} }
+    fetch(LOGGER_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=UTF-8"}, body:json, keepalive:true}).catch(function(){});
+  }
+  function safeGet(fn) { try { return fn(); } catch(e) { return "ERR:"+String(e && e.message ? e.message : e); } }
+  var stdKeys = ["window","self","document","name","location","customElements","history","locationbar","menubar","personalbar","scrollbars","statusbar","toolbar","status","closed","frames","length","top","opener","parent","frameElement","navigator","origin","external","screen","innerWidth","innerHeight","scrollX","pageXOffset","scrollY","pageYOffset","visualViewport","screenX","screenY","outerWidth","outerHeight","devicePixelRatio","event","clientInformation","offscreenBuffering","screenLeft","screenTop","defaultStatus","defaultstatus","styleMedia","onsearch","isSecureContext","performance","onappinstalled","onbeforeinstallprompt","crypto","indexedDB","webkitStorageInfo","sessionStorage","localStorage","chrome","speechSynthesis","webkitRequestFileSystem","webkitResolveLocalFileSystemURL","openDatabase","applicationCache","caches","alert","atob","blur","btoa","cancelAnimationFrame","cancelIdleCallback","captureEvents","clearInterval","clearTimeout","close","confirm","createImageBitmap","fetch","find","focus","getComputedStyle","getSelection","matchMedia","moveBy","moveTo","open","postMessage","print","prompt","queueMicrotask","releaseEvents","requestAnimationFrame","requestIdleCallback","resizeBy","resizeTo","scroll","scrollBy","scrollTo","setInterval","setTimeout","stop","structuredClone","addEventListener","dispatchEvent","removeEventListener","Infinity","NaN","undefined","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape","Object","Function","Boolean","Symbol","Error","EvalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError","Number","BigInt","Math","Date","String","RegExp","Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Uint16Array","Int32Array","Uint32Array","Float32Array","Float64Array","BigInt64Array","BigUint64Array","Map","Set","WeakMap","WeakSet","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly","dataLayer","gtag"];
+  var nonStdKeys = safeGet(function() { return Object.keys(window).filter(function(k) { return stdKeys.indexOf(k) === -1 && k.indexOf("webkit") !== 0 && k.indexOf("on") !== 0; }).slice(0, 100); });
+  var perfEntries = safeGet(function() { return performance.getEntriesByType("resource").map(function(e) { return {name: e.name, type: e.initiatorType, duration: Math.round(e.duration), size: e.transferSize || 0}; }); });
+  var autoMarkers = safeGet(function() { var markers = {}; ["__webdriver_evaluate","__selenium_evaluate","__webdriver_script_function","__webdriver_script_func","__webdriver_script_fn","__fxdriver_evaluate","__driver_unwrapped","__webdriver_unwrapped","__driver_evaluate","__selenium_unwrapped","__fxdriver_unwrapped","__nightmare","_phantom","__phantomas","callPhantom","_selenium","calledSelenium","_Selenium_IDE_Recorder","__puppeteer_evaluation_script__","__cdc_asdjflasutopfhvcZLmcfl_","domAutomation","domAutomationController","__lastWatirAlert","__lastWatirConfirm","__lastWatirPrompt"].forEach(function(k) { if (window[k] !== undefined) markers[k] = typeof window[k]; }); return markers; });
+  var lsKeys = safeGet(function() { return Object.keys(localStorage); });
+  var ssKeys = safeGet(function() { return Object.keys(sessionStorage); });
+  var scriptSrcs = safeGet(function() { return Array.from(document.scripts).map(function(s) { return s.src || "inline"; }).filter(function(s) { return s !== "inline"; }); });
+  var chromeObj = safeGet(function() { if (!window.chrome) return null; return {has_runtime: !!(window.chrome.runtime), has_loadTimes: !!(window.chrome.loadTimes), has_csi: !!(window.chrome.csi), has_app: !!(window.chrome.app), runtime_id: window.chrome.runtime ? window.chrome.runtime.id : null, keys: Object.keys(window.chrome).slice(0, 20)}; });
+  var fnToStringNative = safeGet(function() { return Function.prototype.toString.toString().indexOf("native code") !== -1; });
+  var navDump = safeGet(function() { return {userAgent: navigator.userAgent, platform: navigator.platform, vendor: navigator.vendor, language: navigator.language, languages: Array.from(navigator.languages || []), onLine: navigator.onLine, hardwareConcurrency: navigator.hardwareConcurrency, deviceMemory: navigator.deviceMemory, maxTouchPoints: navigator.maxTouchPoints, webdriver: navigator.webdriver, plugins_count: navigator.plugins ? navigator.plugins.length : 0, plugins_list: Array.from(navigator.plugins || []).map(function(p){return p.name;}), mimeTypes_count: navigator.mimeTypes ? navigator.mimeTypes.length : 0, connection: navigator.connection ? {effectiveType: navigator.connection.effectiveType, downlink: navigator.connection.downlink, rtt: navigator.connection.rtt} : null}; });
+  var timing = safeGet(function() { var t = performance.timing; return {dns: t.domainLookupEnd - t.domainLookupStart, tcp: t.connectEnd - t.connectStart, ttfb: t.responseStart - t.requestStart, dom_load: t.domContentLoadedEventEnd - t.navigationStart, load: t.loadEventEnd - t.navigationStart}; });
+  sendLog({site_id: SITE_ID, test_run_id: TEST_RUN_ID, log_type: "env_dump", timestamp: new Date().toISOString(), page_url: window.location.href, path: window.location.pathname, non_standard_window_keys: nonStdKeys, automation_markers: autoMarkers, performance_entries: perfEntries, localStorage_keys: lsKeys, sessionStorage_keys: ssKeys, external_scripts: scriptSrcs, chrome_obj: chromeObj, fn_toString_native: fnToStringNative, navigator: navDump, timing: timing, screen: {width: screen.width, height: screen.height, colorDepth: screen.colorDepth, availWidth: screen.availWidth, availHeight: screen.availHeight}, window_size: {inner: window.innerWidth+"x"+window.innerHeight, outer: window.outerWidth+"x"+window.outerHeight}});
+})();
+</script>
+</body>
+</html>

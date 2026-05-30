@@ -1,0 +1,7 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[edge_functions]]
+  path = "/*"
+  function = "request-logger"
