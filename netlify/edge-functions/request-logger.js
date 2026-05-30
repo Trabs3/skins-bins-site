@@ -6,6 +6,8 @@ const WORKER_URL = "https://skins.companybbig.workers.dev";
 
 // Cookie name for tracking repeat visits
 const COOKIE_NAME = "_sb_sid";
+// Persistent visitor ID cookie (survives across sessions)
+const PERSISTENT_COOKIE = "hp_vid";
 
 const BOT_PATTERNS = [
   "googlebot", "bingbot", "slurp", "duckduckbot", "baiduspider",
@@ -36,6 +38,87 @@ function parseCookies(cookieHeader) {
     if (key) cookies[key.trim()] = val.join("=").trim();
   });
   return cookies;
+}
+
+// --- REFERER PARSER ---
+const SEARCH_DOMAINS = ["google.", "bing.com", "yahoo.com", "duckduckgo.com", "yandex.", "baidu.com", "ecosia.org", "ask.com"];
+const SOCIAL_DOMAINS = ["facebook.com", "fb.com", "instagram.com", "twitter.com", "x.com", "linkedin.com", "reddit.com", "tiktok.com", "youtube.com", "pinterest.com", "t.co"];
+
+function parseReferer(referer) {
+  if (!referer) return { referer_raw: null, referer_domain: null, referer_path: null, is_search_referrer: false, is_social_referrer: false, is_empty_referrer: true };
+  try {
+    const u = new URL(referer);
+    const domain = u.hostname.replace(/^www\./, "");
+    const isSearch = SEARCH_DOMAINS.some(d => domain.includes(d));
+    const isSocial = SOCIAL_DOMAINS.some(d => domain.includes(d));
+    return { referer_raw: referer, referer_domain: domain, referer_path: u.pathname, is_search_referrer: isSearch, is_social_referrer: isSocial, is_empty_referrer: false };
+  } catch {
+    return { referer_raw: referer, referer_domain: null, referer_path: null, is_search_referrer: false, is_social_referrer: false, is_empty_referrer: false };
+  }
+}
+
+// --- SOURCE CLASSIFICATION ---
+function classifySource(referer, query) {
+  const ref = parseReferer(referer);
+  const params = new URLSearchParams(query || "");
+  const utmSource = params.get("utm_source");
+  const utmMedium = params.get("utm_medium");
+  const gclid = params.get("gclid");
+  const fbclid = params.get("fbclid");
+  const msclkid = params.get("msclkid");
+
+  let source_type = "direct";
+  if (gclid || msclkid || utmMedium === "cpc" || utmMedium === "ppc") {
+    source_type = "paid_search";
+  } else if (fbclid || utmSource === "facebook" || utmSource === "instagram") {
+    source_type = "paid_social";
+  } else if (ref.is_search_referrer) {
+    source_type = "organic_search";
+  } else if (ref.is_social_referrer) {
+    source_type = "social";
+  } else if (ref.referer_domain && !ref.is_empty_referrer) {
+    source_type = "referral";
+  }
+
+  return {
+    source_type,
+    referer_parsed: ref,
+    utm: {
+      source: utmSource,
+      medium: utmMedium,
+      campaign: params.get("utm_campaign"),
+      term: params.get("utm_term"),
+      content: params.get("utm_content"),
+    },
+    click_ids: {
+      gclid: gclid || null,
+      fbclid: fbclid || null,
+      msclkid: msclkid || null,
+    },
+  };
+}
+
+// --- BROWSER-LIKE SCORE ---
+function computeBrowserScore(headers, headerAnalysis) {
+  let score = 0;
+  const reasons = [];
+
+  if (headerAnalysis.has_accept_language) { score += 15; reasons.push("+lang"); }
+  if (headerAnalysis.has_accept_encoding) { score += 10; reasons.push("+enc"); }
+  if (headerAnalysis.has_accept) { score += 10; reasons.push("+accept"); }
+  if (headerAnalysis.sec_header_count >= 3) { score += 20; reasons.push("+sec-fetch"); }
+  if (headers.get("sec-ch-ua")) { score += 15; reasons.push("+client-hints"); }
+  if (headers.get("upgrade-insecure-requests")) { score += 10; reasons.push("+upgrade"); }
+  if (headerAnalysis.has_priority) { score += 5; reasons.push("+priority"); }
+  if (!headerAnalysis.encoding_before_accept) { score += 10; reasons.push("+order-ok"); }
+  if (headerAnalysis.lang_in_last_3) { score += 5; reasons.push("+lang-pos"); }
+
+  // Penalties
+  if (headerAnalysis.header_count <= 3) { score -= 30; reasons.push("-few-headers"); }
+  if (headerAnalysis.ua_before_sec_ch) { score -= 10; reasons.push("-ua-order"); }
+  if (!headerAnalysis.has_accept) { score -= 20; reasons.push("-no-accept"); }
+
+  return { browser_like_score: Math.max(0, Math.min(100, score)), score_reasons: reasons };
 }
 
 function generateSessionId() {
@@ -133,6 +216,18 @@ export default async function handler(request, context) {
   const isRepeatVisit = !!existingSessionId;
   const sessionId = existingSessionId || generateSessionId();
 
+  // Persistent visitor ID
+  const existingVid = cookies[PERSISTENT_COOKIE] || null;
+  const isReturningVisitor = !!existingVid;
+  const visitorId = existingVid || crypto.randomUUID();
+
+  // Source classification
+  const sourceData = classifySource(request.headers.get("referer"), url.search);
+
+  // Browser-like score
+  const headerAnalysis = analyzeHeaderOrder(request.headers);
+  const browserScore = computeBrowserScore(request.headers, headerAnalysis);
+
   // Collect all headers into an object (preserving order via array)
   const headersObj = {};
   const headersArray = []; // Ordered array of [key, value] pairs
@@ -145,8 +240,7 @@ export default async function handler(request, context) {
   const tlsVersion = request.headers.get("x-nf-connection-proto") || null;
   const httpVersion = request.headers.get("x-nf-request-id") ? "h2+" : null;
 
-  // Full header order analysis
-  const headerAnalysis = analyzeHeaderOrder(request.headers);
+  // Full header order analysis (already computed above)
 
   // Detect HTTP/2 pseudo-headers ordering (via specific Netlify headers)
   const h2Settings = {
@@ -175,11 +269,20 @@ export default async function handler(request, context) {
 
     // Cookie trap results
     cookie_trap: {
-      has_cookie: isRepeatVisit,
+      has_session_cookie: isRepeatVisit,
       session_id: sessionId,
+      has_persistent_cookie: isReturningVisitor,
+      visitor_id: visitorId,
+      is_returning: isReturningVisitor,
       supports_cookies: isRepeatVisit ? true : "unknown_first_visit",
       raw_cookies: cookieHeader ? Object.keys(cookies) : [],
     },
+
+    // Source classification
+    source: sourceData,
+
+    // Browser-like score (0-100, higher = more browser-like)
+    browser_score: browserScore,
 
     // TLS/HTTP fingerprint signals
     tls_http: {
@@ -265,18 +368,27 @@ export default async function handler(request, context) {
   // Get the response from the origin
   const response = await context.next();
 
-  // Set cookie on the response for cookie trap
+  // Set cookies on the response
+  const newHeaders = new Headers(response.headers);
+  
+  // Session cookie (24h)
   if (!isRepeatVisit) {
-    const newHeaders = new Headers(response.headers);
     newHeaders.append(
       "Set-Cookie",
       `${COOKIE_NAME}=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=86400`
     );
-    return new Response(response.body, {
-      status: response.status,
-      headers: newHeaders,
-    });
+  }
+  
+  // Persistent visitor ID cookie (365 days)
+  if (!isReturningVisitor) {
+    newHeaders.append(
+      "Set-Cookie",
+      `${PERSISTENT_COOKIE}=${visitorId}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`
+    );
   }
 
-  return response;
+  return new Response(response.body, {
+    status: response.status,
+    headers: newHeaders,
+  });
 }
