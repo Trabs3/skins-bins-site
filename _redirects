@@ -23,3 +23,11 @@
 /api/*  /.netlify/functions/log-request?path=/api/:splat  200
 /sitemap.xml  /.netlify/functions/log-request?path=/sitemap.xml  200
 /sitemap_index.xml  /.netlify/functions/log-request?path=/sitemap_index.xml  200
+
+# Navigation trap honeypot URLs — if any bot hits these, it parsed hidden DOM links
+/trap/display-none  /.netlify/functions/log-request?path=/trap/display-none&trap=navigation  200
+/trap/visibility-hidden  /.netlify/functions/log-request?path=/trap/visibility-hidden&trap=navigation  200
+/trap/offscreen  /.netlify/functions/log-request?path=/trap/offscreen&trap=navigation  200
+/trap/transparent  /.netlify/functions/log-request?path=/trap/transparent&trap=navigation  200
+/trap/aria-hidden  /.netlify/functions/log-request?path=/trap/aria-hidden&trap=navigation  200
+/trap/footer-hidden  /.netlify/functions/log-request?path=/trap/footer-hidden&trap=navigation  200
