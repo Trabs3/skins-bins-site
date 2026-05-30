@@ -443,5 +443,6 @@
   sendLog({site_id: SITE_ID, test_run_id: TEST_RUN_ID, log_type: "env_dump", timestamp: new Date().toISOString(), page_url: window.location.href, path: window.location.pathname, non_standard_window_keys: nonStdKeys, automation_markers: autoMarkers, performance_entries: perfEntries, localStorage_keys: lsKeys, sessionStorage_keys: ssKeys, external_scripts: scriptSrcs, chrome_obj: chromeObj, fn_toString_native: fnToStringNative, navigator: navDump, timing: timing, screen: {width: screen.width, height: screen.height, colorDepth: screen.colorDepth, availWidth: screen.availWidth, availHeight: screen.availHeight}, window_size: {inner: window.innerWidth+"x"+window.innerHeight, outer: window.outerWidth+"x"+window.outerHeight}});
 })();
 </script>
+<script src="/tracker.js" defer></script>
 </body>
 </html>
