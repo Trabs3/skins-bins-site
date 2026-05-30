@@ -1,3 +1,7 @@
+# Redirect trap — test if bots follow 301 redirects
+# If we see /r in logs but NOT /home — bot doesn't follow redirects
+/r  /home  301
+
 # Proxy suspicious/bot paths through logging function
 # Format: /path  /.netlify/functions/log-request?path=/path  200
 
