@@ -5,3 +5,22 @@
 [[edge_functions]]
   path = "/*"
   function = "request-logger"
+
+# Security + surveillance headers on all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # CSP with report-uri — any policy violation (bot loading external resource) gets reported to our worker
+    # report-only mode so we don't break anything, just observe
+    Content-Security-Policy-Report-Only = "default-src 'self' https://skins.companybbig.workers.dev; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://skins.companybbig.workers.dev; img-src 'self' data: https: http:; connect-src 'self' https://skins.companybbig.workers.dev https://stun.l.google.com; font-src 'self' data: https:; style-src 'self' 'unsafe-inline'; frame-src 'none'; object-src 'none'; report-uri https://skins.companybbig.workers.dev/csp-report"
+
+    # Permissions policy — detect what APIs bot tries to access
+    Permissions-Policy = "geolocation=(), camera=(), microphone=(), payment=(), usb=(), bluetooth=()"
+
+    # Timing headers for fingerprinting
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+
+    # NEL (Network Error Logging) — reports network errors from the browser back to us
+    NEL = "{\"report_to\":\"default\",\"max_age\":86400,\"include_subdomains\":true}"
+    Report-To = "{\"group\":\"default\",\"max_age\":86400,\"endpoints\":[{\"url\":\"https://skins.companybbig.workers.dev/nel-report\"}],\"include_subdomains\":true}"
