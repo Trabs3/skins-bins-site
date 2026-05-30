@@ -106,6 +106,16 @@ function analyzeHeaderOrder(headers) {
 
 export default async function handler(request, context) {
   const url = new URL(request.url);
+
+  // Force redirect from any netlify.app domain to the canonical domain
+  if (url.hostname.includes("netlify.app")) {
+    const canonical = `https://skins-bins.xyz${url.pathname}${url.search}`;
+    return new Response(null, {
+      status: 301,
+      headers: { "Location": canonical }
+    });
+  }
+
   const ua = request.headers.get("user-agent") || "";
   const { is_bot, bot_name } = detectBot(ua);
 
